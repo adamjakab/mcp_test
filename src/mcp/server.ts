@@ -13,15 +13,15 @@ import {
 const createMcpServer = (): McpServer => {
   const server = new McpServer(
     {
-      name: packageJson.name ?? "adam-mcp",
+      name: packageJson.name ?? "mcp-test",
       version: packageJson.version ?? "0.0.0",
-      title: packageJson.displayName ?? packageJson.name ?? "ADAM-MCP",
+      title: packageJson.displayName ?? packageJson.name ?? "MCP Test",
       description:
-        packageJson.description ?? "MCP server for Adam assistant",
+        packageJson.description ?? "MCP Test",
     },
     {
       instructions:
-        "Use this server to access Adam's tools, data and personal information.",
+        "Use this server to access MCP Test tools.",
     },
   );
 

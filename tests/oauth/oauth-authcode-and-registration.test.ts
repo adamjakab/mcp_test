@@ -816,4 +816,11 @@ describe('OAuth Well-Known Endpoints', () => {
     expect(json.bearer_methods_supported).toContain('header');
     expect(json.scopes_supported).toContain('mcp');
   });
+
+  it('redirects the server root to /mcp', async () => {
+    const res = await fetch(baseUrl, { redirect: 'manual' });
+
+    expect(res.status).toBe(302);
+    expect(res.headers.get('location')).toBe('/mcp');
+  });
 });
