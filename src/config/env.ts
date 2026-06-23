@@ -1,12 +1,6 @@
 import { config } from "dotenv";
 import { isAbsolute, resolve } from "path";
 
-type OpenApiToolSource = {
-  url: string;
-  namePrefix?: string;
-  headerEnvVars?: Record<string, string>;
-};
-
 config();
 
 // Project root - two levels up from this file. Works for both the TS source
@@ -89,77 +83,7 @@ export const isUserAllowed = (githubId: number | undefined | null): boolean => {
   return GITHUB_ALLOWED_USER_IDS.includes(githubId);
 };
 
-// Dynamic OpenAPI tool sources. Configured via the OPENAPI_TOOL_SOURCES env
-// var, which must be a JSON array of objects matching `OpenApiToolSource`.
-// Example:
-//   OPENAPI_TOOL_SOURCES=[{
-//     "url":"https://mygarminapi.adibadi.net/openapi.json",
-//     "namePrefix":"garmin_",
-//     "headerEnvVars":{"x-api-key":"GARMIN_API_KEY"}
-//   }]
-//
-// Returns an empty array if the env var is unset or contains the empty string.
-// Throws on invalid JSON or wrong shape so misconfiguration fails fast.
-const parseOpenApiToolSources = (): OpenApiToolSource[] => {
-  const raw = process.env.OPENAPI_TOOL_SOURCES;
-  if (!raw || raw.trim() === "") return [];
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (error) {
-    throw new Error(
-      `OPENAPI_TOOL_SOURCES is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-
-  if (!Array.isArray(parsed)) {
-    throw new Error("OPENAPI_TOOL_SOURCES must be a JSON array");
-  }
-
-  const sources: OpenApiToolSource[] = [];
-  parsed.forEach((entry, index) => {
-    if (typeof entry !== "object" || entry === null) {
-      throw new Error(`OPENAPI_TOOL_SOURCES[${index}] must be an object`);
-    }
-    const e = entry as Record<string, unknown>;
-    if (typeof e.url !== "string" || e.url.trim() === "") {
-      throw new Error(
-        `OPENAPI_TOOL_SOURCES[${index}].url must be a non-empty string`,
-      );
-    }
-    sources.push(e as unknown as OpenApiToolSource);
-  });
-
-  return sources;
-};
-
-export const OPENAPI_TOOL_SOURCES: OpenApiToolSource[] =
-  parseOpenApiToolSources();
-
-const parseBooleanEnv = (value: string | undefined, fallback: boolean): boolean => {
-  if (value === undefined || value === "") return fallback;
-  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
-};
-
-// Mailbox settings for IMAP/SMTP tools. These are optional at startup and
-// validated when a mailbox tool is invoked.
-export const MAILBOX_IMAP_HOST = process.env.MAILBOX_IMAP_HOST || "";
-export const MAILBOX_IMAP_PORT = Number(process.env.MAILBOX_IMAP_PORT || "993");
-export const MAILBOX_IMAP_TLS = parseBooleanEnv(process.env.MAILBOX_IMAP_TLS, true);
-export const MAILBOX_IMAP_USER = process.env.MAILBOX_IMAP_USER || "";
-export const MAILBOX_IMAP_PASSWORD = process.env.MAILBOX_IMAP_PASSWORD || "";
-export const MAILBOX_IMAP_DEFAULT_BOX = process.env.MAILBOX_IMAP_DEFAULT_BOX || "INBOX";
-
-export const MAILBOX_SMTP_HOST = process.env.MAILBOX_SMTP_HOST || "";
-export const MAILBOX_SMTP_PORT = Number(process.env.MAILBOX_SMTP_PORT || "587");
-export const MAILBOX_SMTP_SECURE = parseBooleanEnv(
-  process.env.MAILBOX_SMTP_SECURE,
-  false,
-);
-export const MAILBOX_SMTP_USER = process.env.MAILBOX_SMTP_USER || "";
-export const MAILBOX_SMTP_PASSWORD = process.env.MAILBOX_SMTP_PASSWORD || "";
-export const MAILBOX_FROM_NAME = process.env.MAILBOX_FROM_NAME || "";
 
 // Path to a JSON file used to persist OAuth state (registered clients and
 // refresh tokens) across server restarts.  When unset, all state is kept
@@ -169,6 +93,7 @@ export const MAILBOX_FROM_NAME = process.env.MAILBOX_FROM_NAME || "";
 // Relative paths (e.g. "./data/store.json") are resolved against the project
 // root so the location is stable regardless of the process's cwd.  Absolute
 // paths are used as-is.
+// Leave unset in production if you want to keep all state in memory only (not recommended).
 export const STORE_PATH: string | undefined = (() => {
     const raw = process.env.STORE_PATH;
     if (!raw || raw === "") return undefined;
