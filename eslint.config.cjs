@@ -50,7 +50,7 @@ module.exports = [
       'no-console': [
         'warn',
         {
-          allow: ['warn', 'error'],
+          allow: ['debug', 'error', 'info', 'log', 'warn'],
         },
       ],
     },
