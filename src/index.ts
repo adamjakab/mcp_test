@@ -1,7 +1,7 @@
 import express from 'express';
 import { json, urlencoded } from 'body-parser';
 import { initializeServer } from './mcp/server';
-import { ALLOWED_GITHUB_USER_IDS, PORT, PUBLIC_BASE_URL } from './config/env';
+import { GITHUB_ALLOWED_USER_IDS, PORT, PUBLIC_BASE_URL } from './config/env';
 import { oauthRouter } from './oauth/router';
 import { bearerAuth } from './oauth/middleware';
 
@@ -26,7 +26,7 @@ const start = async (): Promise<void> => {
         console.log(`MCP server is running on port: ${PORT}`);
         console.log(`Public base URL: ${PUBLIC_BASE_URL}`);
         console.log(
-            `Allowed GitHub user IDs: ${ALLOWED_GITHUB_USER_IDS.join(', ') || '(none — server is locked down)'}`
+            `Allowed GitHub user IDs: ${GITHUB_ALLOWED_USER_IDS.join(', ') || '(none — server is locked down)'}`
         );
     });
 };

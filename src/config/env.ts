@@ -65,11 +65,11 @@ export const SESSION_IDLE_TTL_HOURS = Number(
 export const SESSION_IDLE_TTL_MS = SESSION_IDLE_TTL_HOURS * 60 * 60 * 1000;
 
 // Hardcoded allowlist of GitHub numeric user IDs permitted to use this MCP
-// server. The list is sourced from the ALLOWED_GITHUB_USER_IDS env var
+// server. The list is sourced from the GITHUB_ALLOWED_USER_IDS env var
 // (comma-separated numeric IDs). GitHub IDs are stable and immutable, unlike
 // logins which a user can rename.
-export const ALLOWED_GITHUB_USER_IDS: number[] = (
-  process.env.ALLOWED_GITHUB_USER_IDS || ""
+export const GITHUB_ALLOWED_USER_IDS: number[] = (
+  process.env.GITHUB_ALLOWED_USER_IDS || ""
 )
   .split(",")
   .map((s) => s.trim())
@@ -78,7 +78,7 @@ export const ALLOWED_GITHUB_USER_IDS: number[] = (
     const n = Number(s);
     if (!Number.isInteger(n) || n <= 0) {
       throw new Error(
-        `Invalid entry in ALLOWED_GITHUB_USER_IDS: "${s}" is not a positive integer`,
+        `Invalid entry in GITHUB_ALLOWED_USER_IDS: "${s}" is not a positive integer`,
       );
     }
     return n;
@@ -86,7 +86,7 @@ export const ALLOWED_GITHUB_USER_IDS: number[] = (
 
 export const isUserAllowed = (githubId: number | undefined | null): boolean => {
   if (githubId === undefined || githubId === null) return false;
-  return ALLOWED_GITHUB_USER_IDS.includes(githubId);
+  return GITHUB_ALLOWED_USER_IDS.includes(githubId);
 };
 
 // Dynamic OpenAPI tool sources. Configured via the OPENAPI_TOOL_SOURCES env

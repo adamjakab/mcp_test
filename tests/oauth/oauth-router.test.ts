@@ -307,7 +307,7 @@ describe("oauth /token", () => {
     registerClient(clientId, redirectUri);
 
     const pkce = makePkcePair();
-    // 99999 is intentionally NOT in ALLOWED_GITHUB_USER_IDS (12345,67890).
+    // 99999 is intentionally NOT in GITHUB_ALLOWED_USER_IDS (12345,67890).
     const code = seedAuthCode({
       client_id: clientId,
       redirect_uri: redirectUri,
