@@ -817,10 +817,14 @@ describe('OAuth Well-Known Endpoints', () => {
     expect(json.scopes_supported).toContain('mcp');
   });
 
-  it('redirects the server root to /mcp', async () => {
-    const res = await fetch(baseUrl, { redirect: 'manual' });
+  it('serves root discovery metadata without redirecting to /mcp', async () => {
+    const res = await fetch(baseUrl);
 
-    expect(res.status).toBe(302);
-    expect(res.headers.get('location')).toBe('/mcp');
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.service).toBe('mcp-server');
+    expect(typeof json.mcp_endpoint).toBe('string');
+    expect(typeof json.oauth_protected_resource_metadata).toBe('string');
+    expect(typeof json.oauth_authorization_server_metadata).toBe('string');
   });
 });

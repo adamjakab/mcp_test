@@ -37,10 +37,17 @@ const appendQuery = (base: string, params: Record<string, string | undefined>): 
 export const oauthRouter = (): Router => {
     const router = Router();
 
-    // Some MCP clients probe the server root before following OAuth metadata.
-    // Redirect them to the actual MCP transport endpoint.
+    // Some MCP clients probe the server root during discovery.
+    // Return lightweight service metadata instead of redirecting to /mcp,
+    // because /mcp requires an initialized MCP session.
     router.get('/', (_req: Request, res: Response) => {
-        res.redirect(302, '/mcp');
+        res.json({
+            name: 'mcp-test',
+            service: 'mcp-server',
+            mcp_endpoint: RESOURCE_URL,
+            oauth_protected_resource_metadata: `${PUBLIC_BASE_URL}/.well-known/oauth-protected-resource/mcp`,
+            oauth_authorization_server_metadata: `${PUBLIC_BASE_URL}/.well-known/oauth-authorization-server`,
+        });
     });
 
     // ---- RFC 9728: Protected Resource Metadata ---------------------------
