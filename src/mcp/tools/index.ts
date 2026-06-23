@@ -16,10 +16,10 @@ type DiscoveredTool = {
 
 /**
  * Recursively walk the tools directory and return every tool module file
- * along with its dotted name. The name is derived from the path relative
- * to `baseDir`: subfolder segments joined with `.` followed by the file
+ * along with its flattened name. The name is derived from the path relative
+ * to `baseDir`: subfolder segments joined with `_` followed by the file
  * basename (without extension). For example, `generic/ping.ts` becomes
- * `generic.ping`.
+ * `generic_ping`.
  */
 const discoverToolFiles = (
   baseDir: string,
@@ -52,7 +52,7 @@ const discoverToolFiles = (
     const relative = path.relative(baseDir, entryPath);
     const withoutExt = relative.slice(0, -moduleExt.length);
     const segments = withoutExt.split(path.sep).filter(Boolean);
-    const name = segments.join(".");
+    const name = segments.join("_");
 
     discovered.push({ name, filePath: entryPath });
   }
@@ -102,7 +102,7 @@ const stringifyForLog = (value: unknown): string => {
 };
 
 /**
- * Wrap a tool handler so every invocation is logged with its dotted name,
+ * Wrap a tool handler so every invocation is logged with its resolved name,
  * arguments, duration and outcome. The original handler signature is
  * preserved so the SDK still sees the same callable shape.
  */

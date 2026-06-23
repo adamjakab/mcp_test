@@ -25,9 +25,9 @@ export type ToolHandler = (...args: any[]) => unknown | Promise<unknown>;
 /**
  * A tool module exported by any file under `src/mcp/tools` (excluding
  * `index.ts` and `types.ts`). The tool's public name is derived from its
- * location: subfolder names joined with `.` followed by the filename
+ * location: subfolder names joined with `_` followed by the filename
  * (without extension). For example, `generic/ping.ts` is registered as
- * `generic.ping`.
+ * `generic_ping`.
  */
 export interface ToolModule {
   config: ToolConfig;
