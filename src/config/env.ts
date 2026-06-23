@@ -1,7 +1,11 @@
 import { config } from "dotenv";
 import { isAbsolute, resolve } from "path";
 
-import type { OpenApiToolSource } from "../mcp/openapi";
+type OpenApiToolSource = {
+  url: string;
+  namePrefix?: string;
+  headerEnvVars?: Record<string, string>;
+};
 
 config();
 

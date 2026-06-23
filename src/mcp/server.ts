@@ -4,27 +4,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { registerTools } from "./tools";
-import {
-  loadOpenApiSources,
-  registerOpenApiTools,
-  type LoadedOpenApiSource,
-} from "./openapi";
-import {
-  loadAllStoreSchemas,
-  registerMemoryResources,
-  type MemoryStoreSchema,
-} from "./memory";
 import packageJson from "../../package.json";
 import {
   SESSION_IDLE_TTL_HOURS,
   SESSION_IDLE_TTL_MS,
-  OPENAPI_TOOL_SOURCES,
 } from "../config/env";
 
-const createMcpServer = (
-  openApiSources: LoadedOpenApiSource[],
-  memoryStores: MemoryStoreSchema[],
-): McpServer => {
+const createMcpServer = (): McpServer => {
   const server = new McpServer(
     {
       name: packageJson.name ?? "adam-mcp",
@@ -39,14 +25,8 @@ const createMcpServer = (
     },
   );
 
-  // Register built-in tools (includes memory tools).
-  registerTools(server, memoryStores);
-
-  // Register memory stores as MCP resources.
-  registerMemoryResources(server, memoryStores);
-
-  // Register dynamic OpenAPI tools from configured sources.
-  registerOpenApiTools(server, openApiSources);
+  // Register built-in tools.
+  registerTools(server);
 
   return server;
 };
@@ -128,18 +108,6 @@ const sweepIdleSessions = async (): Promise<void> => {
 };
 
 export const initializeServer = async (app: Application): Promise<void> => {
-  const openApiSources = await loadOpenApiSources(OPENAPI_TOOL_SOURCES);
-  if (OPENAPI_TOOL_SOURCES.length > 0 && openApiSources.length === 0) {
-    console.warn(
-      "[MCP] OPENAPI_TOOL_SOURCES is configured but no specs could be loaded; continuing with built-in tools only",
-    );
-  }
-
-  const memoryStores = loadAllStoreSchemas();
-  console.log(
-    `[Memory] loaded ${memoryStores.length} store(s): ${memoryStores.map((s) => s.name).join(", ") || "(none)"}`,
-  );
-
   if (!sessionSweepTimer) {
     sessionSweepTimer = setInterval(() => {
       void sweepIdleSessions();
@@ -186,7 +154,7 @@ export const initializeServer = async (app: Application): Promise<void> => {
         isInitializeRequest(req.body)
       ) {
         console.log("[MCP] initialize request received; creating new session");
-        const server = createMcpServer(openApiSources, memoryStores);
+        const server = createMcpServer();
 
         const transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
